@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="KJ Land Surveyors & Realtors Consultants — Kenya's #1 ISK-registered land surveying firm. Precision GPS surveys, title deed processing, GIS mapping across all 47 counties."/>
+<title>KJ Land Surveyors & Realtors Consultants — Precision. Nationwide.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#07120a;--ink2:#0d1a10;--ink3:#132018;--ink4:#1a2b1f;
+  --green:#2d6a4f;--green2:#40916c;--green3:#52b788;--green4:#1b4332;
+  --cream:#f5f0e8;--cream2:#e8dfc8;--cream3:#c4b99a;--cream4:#7a7060;
+  --white:#fafaf7;--wa:#25D366;--em:#4A90D9;--gm:#EA4335;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--ink);color:var(--cream2);font-family:'DM Sans',sans-serif;overflow-x:hidden;cursor:none;}
+
+/* CURSOR */
+#cur{position:fixed;top:0;left:0;z-index:9999;pointer-events:none;mix-blend-mode:difference;}
+#cur-dot{width:6px;height:6px;background:var(--white);border-radius:50%;position:absolute;transform:translate(-50%,-50%);}
+#cur-ring{width:40px;height:40px;border:1px solid rgba(255,255,255,.5);border-radius:50%;position:absolute;transform:translate(-50%,-50%);transition:width .25s,height .25s,border-color .25s,border-radius .25s;}
+body.cl #cur-ring{width:56px;height:56px;border-color:var(--green3);border-radius:4px;}
+body.ct #cur-ring{width:3px;height:30px;border-radius:2px;border-color:var(--green3);}
+
+/* CANVAS */
+#hc{position:absolute;inset:0;width:100%;height:100%;opacity:.5;}
+
+/* LOADER */
+#loader{position:fixed;inset:0;z-index:9000;background:var(--ink);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2rem;}
+.ll{font-family:'Playfair Display',serif;font-size:4rem;font-weight:900;color:var(--white);letter-spacing:-.02em;opacity:0;animation:lf .8s .3s forwards;}
+.ll span{color:var(--green3);}
+.lb-w{width:200px;height:1px;background:rgba(255,255,255,.1);overflow:hidden;}
+.lb{height:100%;background:var(--green3);width:0;animation:lb 1.8s .4s cubic-bezier(.4,0,.2,1) forwards;}
+.lt{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--cream4);opacity:0;animation:lf .6s 1.5s forwards;}
+@keyframes lf{to{opacity:1;}}@keyframes lb{to{width:100%;}}
+#loader.done{animation:lo .6s .2s forwards;pointer-events:none;}@keyframes lo{to{opacity:0;}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:800;display:flex;align-items:center;justify-content:space-between;padding:2rem 3.5rem;transition:padding .4s,background .4s;}
+nav.compact{padding:1.1rem 3.5rem;background:rgba(7,18,10,.92);backdrop-filter:blur(24px);border-bottom:1px solid rgba(82,183,136,.12);}
+.nl{display:flex;align-items:center;gap:.8rem;text-decoration:none;}
+.nlm{width:40px;height:40px;border:1px solid var(--green3);display:grid;place-items:center;font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;color:var(--green3);position:relative;letter-spacing:.05em;}
+.nlm::after{content:'';position:absolute;inset:4px;border:1px solid rgba(82,183,136,.25);}
+.nlt b{display:block;font-family:'Playfair Display',serif;font-size:.95rem;color:var(--white);font-weight:700;letter-spacing:.01em;line-height:1.2;}
+.nlt small{display:block;font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.3em;text-transform:uppercase;color:var(--cream4);}
+.nls{display:flex;align-items:center;gap:3rem;list-style:none;}
+.nls a{font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:var(--cream4);text-decoration:none;transition:color .3s;position:relative;}
+.nls a:hover{color:var(--cream);}
+.nls a::after{content:'';position:absolute;bottom:-3px;left:0;width:0;height:1px;background:var(--green3);transition:width .3s;}
+.nls a:hover::after{width:100%;}
+.nc{color:var(--ink)!important;background:var(--green3);padding:.6rem 1.5rem;font-family:'DM Mono',monospace;font-size:.6rem!important;letter-spacing:.2em;font-weight:500;transition:background .3s,transform .2s!important;}
+.nc::after{display:none!important;}.nc:hover{background:var(--green2)!important;transform:translateY(-1px);}
+
+/* HERO */
+#hero{min-height:100vh;position:relative;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;background:var(--ink);}
+.hl{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;padding:10rem 3.5rem 5rem;}
+.he{display:flex;align-items:center;gap:1rem;margin-bottom:1.8rem;font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.35em;text-transform:uppercase;color:var(--green3);opacity:0;animation:su .8s .4s forwards;}
+.he::before{content:'';width:36px;height:1px;background:var(--green3);}
+.ht{font-family:'Playfair Display',serif;font-size:clamp(3.8rem,5.5vw,7rem);font-weight:900;line-height:.95;letter-spacing:-.02em;color:var(--white);margin-bottom:2.5rem;}
+.ht .ln{display:block;overflow:hidden;}
+.ht .ln span{display:block;transform:translateY(110%);animation:lr .9s cubic-bezier(.16,1,.3,1) forwards;}
+.ht .ln:nth-child(1) span{animation-delay:.5s;}.ht .ln:nth-child(2) span{animation-delay:.65s;}.ht .ln:nth-child(3) span{animation-delay:.8s;}
+.ht em{font-style:italic;color:var(--green3);}
+@keyframes lr{to{transform:translateY(0);}}
+@keyframes su{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.hd{font-size:.95rem;color:var(--cream4);line-height:1.9;max-width:420px;margin-bottom:3rem;opacity:0;animation:su .8s 1s forwards;}
+.ha{display:flex;align-items:center;gap:2.5rem;opacity:0;animation:su .8s 1.15s forwards;}
+.mb{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:.7rem;padding:1rem 2.2rem;background:var(--green3);color:var(--ink);font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;font-weight:500;text-decoration:none;transition:background .3s;}
+.mb::before{content:'';position:absolute;inset:0;background:var(--green2);transform:translateX(-101%);transition:transform .4s cubic-bezier(.16,1,.3,1);}
+.mb:hover::before{transform:translateX(0);}
+.mb span,.mb svg{position:relative;z-index:1;}
+.mb svg{width:12px;height:12px;transition:transform .3s;}.mb:hover svg{transform:translateX(4px);}
+.hlink{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--cream4);text-decoration:none;display:flex;align-items:center;gap:.7rem;transition:color .3s;}
+.hlink::before{content:'';width:28px;height:1px;background:currentColor;transition:width .3s;}
+.hlink:hover{color:var(--cream);}.hlink:hover::before{width:44px;}
+
+/* Hero Right */
+.hr{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.hr::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,var(--green4),transparent);}
+.ga{position:absolute;inset:0;background:linear-gradient(rgba(82,183,136,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(82,183,136,.05) 1px,transparent 1px);background-size:48px 48px;animation:gs 18s linear infinite;}
+@keyframes gs{0%{background-position:0 0;}100%{background-position:48px 48px;}}
+.sln{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--green3),transparent);animation:sc 3s linear infinite;box-shadow:0 0 20px var(--green3),0 0 60px rgba(82,183,136,.3);}
+@keyframes sc{0%{top:0;opacity:0;}5%{opacity:1;}95%{opacity:1;}100%{top:100%;opacity:0;}}
+.cp{position:relative;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;padding:10rem 4rem 6rem;opacity:0;animation:su 1s 1.2s forwards;}
+.cm{width:100%;max-width:380px;aspect-ratio:1;margin:0 auto;}
+.cm svg{width:100%;height:100%;}
+.ci{position:absolute;font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.15em;color:var(--green4);}
+.ci span{display:block;color:var(--green3);font-size:.62rem;margin-top:.1rem;}
+.ci.tl{top:10rem;left:3.5rem;}.ci.tr{top:10rem;right:3.5rem;text-align:right;}
+.ci.bl{bottom:5rem;left:3.5rem;}.ci.br{bottom:5rem;right:3.5rem;text-align:right;}
+
+/* Stats */
+.hs{position:absolute;bottom:0;left:0;right:0;z-index:5;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(82,183,136,.12);}
+.hst{padding:1.8rem 2.5rem;border-right:1px solid rgba(82,183,136,.08);position:relative;overflow:hidden;opacity:0;animation:su .6s forwards;}
+.hst:nth-child(1){animation-delay:1.3s;}.hst:nth-child(2){animation-delay:1.4s;}.hst:nth-child(3){animation-delay:1.5s;}.hst:nth-child(4){animation-delay:1.6s;border-right:none;}
+.hst::before{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--green3);transition:width .6s;}
+.hst:hover::before{width:100%;}
+.hsn{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:900;color:var(--white);line-height:1;}
+.hsn sup{font-size:1rem;vertical-align:super;}
+.hsl{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.25em;text-transform:uppercase;color:var(--cream4);margin-top:.4rem;}
+
+/* TICKER */
+.tw{background:var(--green3);padding:.7rem 0;overflow:hidden;}
+.tt{display:flex;white-space:nowrap;animation:tm 22s linear infinite;}
+.ti{display:inline-flex;align-items:center;gap:1.8rem;padding:0 1.8rem;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--ink);font-weight:500;}
+.td{width:3px;height:3px;background:var(--ink);border-radius:50%;flex-shrink:0;opacity:.5;}
+@keyframes tm{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* GENERIC */
+.sp{padding:8rem 3.5rem;}
+.sl2{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.38em;text-transform:uppercase;color:var(--green4);display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;}
+.sl2::before{content:'';width:28px;height:1px;background:var(--green4);}
+.stt{font-family:'Playfair Display',serif;font-size:clamp(2rem,3.5vw,3.8rem);font-weight:900;line-height:1.05;letter-spacing:-.01em;color:var(--white);}
+.stt em{font-style:italic;color:var(--green3);}
+[data-r]{opacity:0;transform:translateY(32px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);}
+[data-r].on{opacity:1;transform:none;}
+[data-rl]{opacity:0;transform:translateX(-32px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);}
+[data-rl].on{opacity:1;transform:none;}
+[data-rr]{opacity:0;transform:translateX(32px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);}
+[data-rr].on{opacity:1;transform:none;}
+
+/* SERVICES */
+#services{background:var(--ink2);}
+.sh{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:end;margin-bottom:5rem;}
+.sd{font-size:.95rem;color:var(--cream4);line-height:1.9;align-self:end;}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid rgba(82,183,136,.1);}
+.sc2{padding:2.8rem;border-right:1px solid rgba(82,183,136,.08);border-bottom:1px solid rgba(82,183,136,.08);position:relative;overflow:hidden;transition:background .4s;cursor:none;}
+.sc2:nth-child(3n){border-right:none;}.sc2:nth-child(4),.sc2:nth-child(5),.sc2:nth-child(6){border-bottom:none;}
+.sc2:hover{background:var(--ink3);}
+.sf{position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(82,183,136,.08) 0%,transparent 70%);opacity:0;transition:opacity .4s;pointer-events:none;}
+.sc2:hover .sf{opacity:1;}
+.snum{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.2em;color:var(--cream4);margin-bottom:2rem;}
+.sico{width:44px;height:44px;border:1px solid rgba(82,183,136,.25);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;transition:border-color .3s,background .3s;}
+.sc2:hover .sico{border-color:var(--green3);background:rgba(82,183,136,.06);}
+.sico svg{width:18px;height:18px;stroke:var(--green3);fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.snm{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--white);margin-bottom:.7rem;}
+.stxt{font-size:.85rem;color:var(--cream4);line-height:1.75;}
+.sar{position:absolute;bottom:2rem;right:2rem;width:32px;height:32px;border:1px solid rgba(82,183,136,.15);display:flex;align-items:center;justify-content:center;transition:background .3s,border-color .3s,transform .3s;opacity:0;transform:translate(4px,4px);}
+.sc2:hover .sar{opacity:1;transform:translate(0,0);background:var(--green3);border-color:var(--green3);}
+.sar svg{width:12px;height:12px;stroke:var(--ink);fill:none;}
+
+/* MARQUEE */
+.md{overflow:hidden;padding:3rem 0;border-top:1px solid rgba(82,183,136,.1);border-bottom:1px solid rgba(82,183,136,.1);background:var(--ink);}
+.mtr{display:flex;white-space:nowrap;gap:3rem;animation:mq 30s linear infinite;}
+.mw{font-family:'Playfair Display',serif;font-size:3rem;font-weight:900;color:transparent;-webkit-text-stroke:1px rgba(82,183,136,.2);letter-spacing:-.01em;flex-shrink:0;}
+.mw.f{color:var(--green3);-webkit-text-stroke:0;opacity:.18;}
+@keyframes mq{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* ABOUT */
+#about{background:var(--ink);display:grid;grid-template-columns:1fr 1fr;min-height:90vh;}
+.av{position:relative;overflow:hidden;background:var(--ink3);border-right:1px solid rgba(82,183,136,.1);}
+.avi{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:3rem;}
+.amw{position:relative;width:340px;height:340px;}.amw svg{width:100%;height:100%;}
+.aog{position:absolute;inset:-40px;background:linear-gradient(rgba(82,183,136,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(82,183,136,.05) 1px,transparent 1px);background-size:36px 36px;pointer-events:none;}
+.abg{position:absolute;top:2.5rem;right:2.5rem;background:var(--green3);padding:1.2rem 1.5rem;display:flex;flex-direction:column;align-items:flex-end;gap:.2rem;}
+.abg b{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--ink);line-height:1;}
+.abg small{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(7,18,10,.65);}
+.ab{position:absolute;bottom:0;left:0;right:0;border-top:1px solid rgba(82,183,136,.12);padding:2rem 2.5rem;display:flex;gap:3rem;}
+.ac2{font-family:'DM Mono',monospace;font-size:.55rem;color:var(--cream4);letter-spacing:.1em;}
+.ac2 span{display:block;color:var(--green3);font-size:.62rem;margin-bottom:.2rem;}
+.acd{padding:6rem 4rem;display:flex;flex-direction:column;justify-content:center;}
+.af{display:flex;gap:1.5rem;padding:2rem 0;border-bottom:1px solid rgba(82,183,136,.08);transition:background .3s,padding-left .3s;}
+.af:first-of-type{border-top:1px solid rgba(82,183,136,.08);margin-top:2.5rem;}
+.af:hover{background:rgba(82,183,136,.02);padding-left:.5rem;}
+.afn{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--cream4);opacity:.3;flex-shrink:0;line-height:1;padding-top:.1rem;min-width:40px;transition:color .3s,opacity .3s;}
+.af:hover .afn{color:var(--green3);opacity:1;}
+.aft{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--white);margin-bottom:.4rem;}
+.afp{font-size:.85rem;color:var(--cream4);line-height:1.75;}
+
+/* TESTIMONIALS */
+#testimonials{background:var(--ink2);padding:8rem 3.5rem;}
+.test-header{text-align:center;margin-bottom:5rem;}
+.test-header .sl2{justify-content:center;}
+.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(82,183,136,.1);}
+.test-card{background:var(--ink2);padding:2.5rem;position:relative;transition:background .3s;}
+.test-card:hover{background:var(--ink3);}
+.test-stars{display:flex;gap:.3rem;margin-bottom:1.5rem;}
+.test-star{color:var(--green3);font-size:1rem;}
+.test-quote{font-family:'Playfair Display',serif;font-size:1.05rem;font-style:italic;color:var(--cream2);line-height:1.7;margin-bottom:1.5rem;}
+.test-quote::before{content:'"';font-size:2rem;color:var(--green3);line-height:0;vertical-align:-.4em;margin-right:.2rem;}
+.test-name{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--green3);}
+.test-loc{font-size:.78rem;color:var(--cream4);margin-top:.2rem;}
+
+/* PROCESS */
+#process{background:var(--ink);}
+.ph{text-align:center;margin-bottom:6rem;}
+.ph .sl2{justify-content:center;}
+.pg{display:grid;grid-template-columns:repeat(4,1fr);position:relative;}
+.pcon{position:absolute;top:3.5rem;left:12.5%;right:12.5%;height:1px;background:linear-gradient(to right,transparent,var(--green4) 20%,var(--green4) 80%,transparent);pointer-events:none;}
+.ps{padding:0 2.5rem;text-align:center;position:relative;transition:transform .3s;}
+.ps:hover{transform:translateY(-6px);}
+.pc{width:72px;height:72px;border:1px solid var(--green4);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 2.5rem;font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:var(--cream4);background:var(--ink);position:relative;z-index:1;transition:border-color .3s,color .3s,background .3s,box-shadow .3s;}
+.ps:hover .pc{border-color:var(--green3);color:var(--green3);box-shadow:0 0 0 8px rgba(82,183,136,.06),0 0 40px rgba(82,183,136,.15);}
+.ptg{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.28em;text-transform:uppercase;color:var(--cream4);margin-bottom:.6rem;}
+.pn{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--white);margin-bottom:.7rem;}
+.pt{font-size:.82rem;color:var(--cream4);line-height:1.8;}
+
+/* TECHNOLOGY */
+#technology{background:var(--ink2);}
+.th{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4rem;}
+.tg{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:rgba(82,183,136,.1);}
+.tc{background:var(--ink2);padding:3rem 2rem;text-align:center;position:relative;overflow:hidden;transition:background .4s;cursor:none;}
+.tc:hover{background:var(--ink3);}
+.tcs{position:absolute;inset:0;background:linear-gradient(135deg,rgba(82,183,136,.07) 0%,transparent 50%);opacity:0;transition:opacity .4s;pointer-events:none;}
+.tc:hover .tcs{opacity:1;}
+.tcl{position:absolute;top:0;left:0;right:0;background:var(--green3);font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.28em;text-transform:uppercase;color:var(--ink);padding:.35rem;transform:translateY(-100%);transition:transform .35s cubic-bezier(.16,1,.3,1);}
+.tc:hover .tcl{transform:translateY(0);}
+.tico{width:56px;height:56px;border:1px solid rgba(82,183,136,.18);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;transition:border-color .3s,background .3s;}
+.tc:hover .tico{border-color:var(--green3);background:rgba(82,183,136,.06);}
+.tico svg{width:22px;height:22px;stroke:var(--green3);fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.tn{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--white);margin-bottom:.35rem;}
+.ts2{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cream4);}
+
+/* FAQ */
+#faq{background:var(--ink);padding:8rem 3.5rem;}
+.faq-header{text-align:center;margin-bottom:5rem;}
+.faq-header .sl2{justify-content:center;}
+.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(82,183,136,.1);max-width:1000px;margin:0 auto;}
+.faq-item{background:var(--ink);padding:2rem 2.5rem;cursor:none;transition:background .3s;}
+.faq-item:hover{background:var(--ink2);}
+.faq-q{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--white);margin-bottom:.75rem;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;}
+.faq-q::after{content:'→';color:var(--green3);font-family:'DM Mono',monospace;font-size:.8rem;flex-shrink:0;transition:transform .3s;}
+.faq-item:hover .faq-q::after{transform:rotate(90deg);}
+.faq-a{font-size:.85rem;color:var(--cream4);line-height:1.8;}
+
+/* CONTACT BUTTONS */
+.contact-actions{display:flex;flex-direction:column;gap:.9rem;margin-top:2.5rem;}
+.cta-btn{display:flex;align-items:center;gap:1rem;padding:1rem 1.4rem;text-decoration:none;font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;font-weight:500;border:1px solid transparent;position:relative;overflow:hidden;transition:transform .25s,box-shadow .25s;cursor:none;}
+.cta-btn::before{content:'';position:absolute;inset:0;transform:translateX(-101%);transition:transform .4s cubic-bezier(.16,1,.3,1);}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3);}
+.cta-btn:hover::before{transform:translateX(0);}
+.cta-btn-ico{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1;}
+.cta-btn-ico svg{width:18px;height:18px;}
+.cta-btn-body{position:relative;z-index:1;display:flex;flex-direction:column;}
+.cta-btn-label{font-size:.52rem;letter-spacing:.3em;opacity:.6;margin-bottom:.1rem;}
+.cta-btn-value{font-size:.78rem;letter-spacing:.08em;color:var(--white);}
+.btn-wa{background:rgba(37,211,102,.08);border-color:rgba(37,211,102,.25);color:var(--wa);}
+.btn-wa::before{background:rgba(37,211,102,.14);}
+.btn-wa .cta-btn-ico{background:rgba(37,211,102,.15);}
+.btn-wa svg{stroke:var(--wa);}
+.btn-em{background:rgba(74,144,217,.08);border-color:rgba(74,144,217,.25);color:var(--em);}
+.btn-em::before{background:rgba(74,144,217,.14);}
+.btn-em .cta-btn-ico{background:rgba(74,144,217,.15);}
+.btn-em svg{stroke:var(--em);}
+.btn-gm{background:rgba(234,67,53,.08);border-color:rgba(234,67,53,.25);color:var(--gm);}
+.btn-gm::before{background:rgba(234,67,53,.14);}
+.btn-gm .cta-btn-ico{background:rgba(234,67,53,.15);}
+.btn-gm svg{stroke:var(--gm);}
+
+/* CONTACT SECTION */
+#contact{background:var(--ink2);display:grid;grid-template-columns:1fr 1fr;}
+.cl2{padding:8rem 4rem;border-right:1px solid rgba(82,183,136,.1);position:relative;overflow:hidden;}
+.cl2::before{content:'KJ';position:absolute;right:-2rem;bottom:-3rem;font-family:'Playfair Display',serif;font-size:18rem;font-weight:900;color:rgba(82,183,136,.03);line-height:1;pointer-events:none;}
+.cds{margin-top:2.5rem;display:flex;flex-direction:column;}
+.ci2{display:flex;align-items:flex-start;gap:1.2rem;padding:1.2rem 0;border-bottom:1px solid rgba(82,183,136,.08);transition:padding-left .3s;}
+.ci2:hover{padding-left:.5rem;}.ci2:last-child{border-bottom:none;}
+.cico{width:36px;height:36px;flex-shrink:0;border:1px solid rgba(82,183,136,.2);display:flex;align-items:center;justify-content:center;transition:border-color .3s,background .3s;}
+.ci2:hover .cico{border-color:var(--green3);background:rgba(82,183,136,.06);}
+.cico svg{width:14px;height:14px;stroke:var(--green3);fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.cil{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.28em;text-transform:uppercase;color:var(--cream4);margin-bottom:.15rem;}
+.civ{font-size:.95rem;color:var(--white);}
+.cr{padding:8rem 4rem;}
+.cf{display:flex;flex-direction:column;gap:1.2rem;}
+.crow{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;}
+.cg{display:flex;flex-direction:column;gap:.5rem;}
+.cfl{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.3em;text-transform:uppercase;color:var(--cream4);}
+.cin,.csel,.cta{background:var(--ink3);border:1px solid rgba(82,183,136,.12);color:var(--white);font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.85rem 1.1rem;outline:none;transition:border-color .3s,background .3s,box-shadow .3s;appearance:none;width:100%;}
+.cin:focus,.csel:focus,.cta:focus{border-color:var(--green3);background:rgba(82,183,136,.03);box-shadow:0 0 0 3px rgba(82,183,136,.08);}
+.cin::placeholder,.cta::placeholder{color:var(--cream4);}
+.csel option{background:var(--ink3);}
+.cta{resize:vertical;min-height:110px;}
+.csub{display:flex;align-items:center;justify-content:center;gap:.8rem;padding:1.1rem;background:var(--green3);border:none;color:var(--ink);font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;font-weight:500;cursor:none;transition:background .3s,transform .2s;width:100%;position:relative;overflow:hidden;}
+.csub::before{content:'';position:absolute;inset:0;background:var(--green2);transform:translateX(-101%);transition:transform .4s cubic-bezier(.16,1,.3,1);}
+.csub:hover::before{transform:translateX(0);}
+.csub span,.csub svg{position:relative;z-index:1;}
+.csub svg{width:14px;height:14px;}
+.csub:hover{transform:translateY(-1px);}
+
+/* FOOTER */
+footer{background:var(--ink);border-top:1px solid rgba(82,183,136,.1);}
+.footer-top{padding:4rem 3.5rem;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:4rem;border-bottom:1px solid rgba(82,183,136,.08);}
+.ft-brand b{display:block;font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--white);margin-top:.8rem;margin-bottom:.5rem;}
+.ft-brand p{font-size:.82rem;color:var(--cream4);line-height:1.8;max-width:280px;margin-top:.75rem;}
+.ft-col h4{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--green3);margin-bottom:1.2rem;}
+.ft-col ul{list-style:none;display:flex;flex-direction:column;gap:.6rem;}
+.ft-col ul a{font-size:.82rem;color:var(--cream4);text-decoration:none;transition:color .3s;}
+.ft-col ul a:hover{color:var(--cream);}
+.footer-bottom{padding:1.8rem 3.5rem;display:flex;align-items:center;justify-content:space-between;}
+.fc{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.18em;color:var(--cream4);}
+.fl{display:flex;gap:2.5rem;list-style:none;}
+.fl a{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.22em;text-transform:uppercase;color:var(--cream4);text-decoration:none;transition:color .3s;}
+.fl a:hover{color:var(--green3);}
+
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--ink);}::-webkit-scrollbar-thumb{background:var(--green4);border-radius:2px;}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+  #hero{grid-template-columns:1fr;}.hr{display:none;}.hs{grid-template-columns:repeat(2,1fr);}
+  .sh{grid-template-columns:1fr;}.sg{grid-template-columns:1fr 1fr;}
+  .sc2:nth-child(2n){border-right:none;}.sc2:nth-child(3n){border-right:1px solid rgba(82,183,136,.08);}
+  #about{grid-template-columns:1fr;}.av{min-height:400px;}
+  .pg{grid-template-columns:1fr 1fr;gap:3rem;}.pcon{display:none;}
+  .tg{grid-template-columns:repeat(3,1fr);}
+  .test-grid{grid-template-columns:1fr 1fr;}
+  .faq-grid{grid-template-columns:1fr;}
+  #contact{grid-template-columns:1fr;}.cl2{border-right:none;border-bottom:1px solid rgba(82,183,136,.1);}
+  .footer-top{grid-template-columns:1fr 1fr;gap:2.5rem;}
+}
+@media(max-width:640px){
+  nav{padding:1.2rem 1.5rem;}.nls{display:none;}
+  .hl{padding:8rem 1.5rem 4rem;}.sp{padding:5rem 1.5rem;}
+  .sg{grid-template-columns:1fr;}.sc2:nth-child(n){border-right:none;}
+  .pg{grid-template-columns:1fr;}.tg{grid-template-columns:1fr 1fr;}
+  .test-grid{grid-template-columns:1fr;}
+  .cl2,.cr{padding:5rem 1.5rem;}.crow{grid-template-columns:1fr;}
+  .footer-top{grid-template-columns:1fr;}
+  .footer-bottom{flex-direction:column;gap:1.5rem;text-align:center;}
+  .fl{flex-wrap:wrap;justify-content:center;}
+  body{cursor:auto;}#cur{display:none;}.contact-actions{gap:.7rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ll">K<span>J</span></div>
+  <div class="lb-w"><div class="lb"></div></div>
+  <div class="lt">Initialising Survey Systems</div>
+</div>
+
+<!-- CURSOR -->
+<div id="cur"><div id="cur-dot"></div><div id="cur-ring"></div></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nl">
+    <div class="nlm">KJ</div>
+    <div class="nlt"><b>KJ Land Surveyors</b><small>& Realtors Consultants</small></div>
+  </a>
+  <ul class="nls">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#technology">Technology</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#contact" class="nc">Survey Now</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="hc"></canvas>
+  <div class="hl">
+    <div class="he">Kenya's #1 Certified Land Surveyors · ISK Registered</div>
+    <h1 class="ht">
+      <span class="ln"><span>Precision</span></span>
+      <span class="ln"><span>Land <em>Survey</em></span></span>
+      <span class="ln"><span>&amp; Realty</span></span>
+    </h1>
+    <p class="hd">Accurate, compliant, and nationwide land solutions — from millimetre-precise RTK GPS surveys to full title deed delivery across all 47 counties of Kenya. Trusted by over 500 landowners since 2014.</p>
+    <div class="ha">
+      <a href="#contact" class="mb"><span>Get Consultation</span><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      <a href="#services" class="hlink">Our Services</a>
+    </div>
+  </div>
+  <div class="hr">
+    <div class="ga"></div>
+    <div class="sln"></div>
+    <div class="cp">
+      <div class="cm">
+        <svg viewBox="0 0 380 380" xmlns="http://www.w3.org/2000/svg">
+          <defs><radialGradient id="rg" cx="50%" cy="50%"><stop offset="0%" stop-color="#52b788" stop-opacity=".18"/><stop offset="100%" stop-color="#52b788" stop-opacity="0"/></radialGradient></defs>
+          <circle cx="190" cy="190" r="155" fill="url(#rg)"/>
+          <circle cx="190" cy="190" r="150" fill="none" stroke="rgba(82,183,136,.1)" stroke-width="1"><animateTransform attributeName="transform" type="rotate" from="0 190 190" to="360 190 190" dur="60s" repeatCount="indefinite"/></circle>
+          <circle cx="190" cy="190" r="125" fill="none" stroke="rgba(82,183,136,.18)" stroke-width="1"><animateTransform attributeName="transform" type="rotate" from="0 190 190" to="-360 190 190" dur="40s" repeatCount="indefinite"/></circle>
+          <circle cx="190" cy="190" r="100" fill="none" stroke="rgba(82,183,136,.1)" stroke-width="1"><animateTransform attributeName="transform" type="rotate" from="0 190 190" to="360 190 190" dur="25s" repeatCount="indefinite"/></circle>
+          <g stroke="rgba(82,183,136,.35)" stroke-width="1"><animateTransform attributeName="transform" type="rotate" from="0 190 190" to="360 190 190" dur="90s" repeatCount="indefinite"/>
+            <line x1="190" y1="42" x2="190" y2="55"/><line x1="190" y1="325" x2="190" y2="338"/>
+            <line x1="42" y1="190" x2="55" y2="190"/><line x1="325" y1="190" x2="338" y2="190"/>
+            <line x1="190" y1="42" x2="190" y2="50" transform="rotate(30 190 190)" stroke-width=".5"/>
+            <line x1="190" y1="42" x2="190" y2="50" transform="rotate(60 190 190)" stroke-width=".5"/>
+            <line x1="190" y1="42" x2="190" y2="50" transform="rotate(120 190 190)" stroke-width=".5"/>
+            <line x1="190" y1="42" x2="190" y2="50" transform="rotate(150 190 190)" stroke-width=".5"/>
+            <line x1="190" y1="42" x2="190" y2="50" transform="rotate(210 190 190)" stroke-width=".5"/>
+            <line x1="190" y1="42" x2="190" y2="50" transform="rotate(240 190 190)" stroke-width=".5"/>
+            <line x1="190" y1="42" x2="190" y2="50" transform="rotate(300 190 190)" stroke-width=".5"/>
+            <line x1="190" y1="42" x2="190" y2="50" transform="rotate(330 190 190)" stroke-width=".5"/>
+          </g>
+          <text x="190" y="34" text-anchor="middle" fill="#52b788" font-size="11" font-family="DM Mono,monospace" letter-spacing="2">N</text>
+          <text x="190" y="354" text-anchor="middle" fill="rgba(82,183,136,.5)" font-size="11" font-family="DM Mono,monospace">S</text>
+          <text x="356" y="194" text-anchor="middle" fill="rgba(82,183,136,.5)" font-size="11" font-family="DM Mono,monospace">E</text>
+          <text x="26" y="194" text-anchor="middle" fill="rgba(82,183,136,.5)" font-size="11" font-family="DM Mono,monospace">W</text>
+          <line x1="190" y1="70" x2="190" y2="310" stroke="rgba(82,183,136,.12)" stroke-width="1" stroke-dasharray="4 4"/>
+          <line x1="70" y1="190" x2="310" y2="190" stroke="rgba(82,183,136,.12)" stroke-width="1" stroke-dasharray="4 4"/>
+          <g><animateTransform attributeName="transform" type="rotate" from="0 190 190" to="360 190 190" dur="12s" repeatCount="indefinite"/>
+            <polygon points="190,92 184,190 190,200 196,190" fill="#52b788"/>
+            <polygon points="190,288 184,190 190,200 196,190" fill="rgba(82,183,136,.25)"/>
+          </g>
+          <circle cx="190" cy="190" r="20" fill="#0d1a10" stroke="#52b788" stroke-width="1"/>
+          <circle cx="190" cy="190" r="5" fill="#52b788"/>
+          <circle cx="190" cy="190" r="65" fill="none" stroke="rgba(82,183,136,.15)" stroke-width="1" stroke-dasharray="2 6"/>
+          <line x1="190" y1="190" x2="328" y2="78" stroke="rgba(82,183,136,.2)" stroke-width="1" stroke-dasharray="3 5"/>
+          <circle cx="328" cy="78" r="4" fill="none" stroke="rgba(82,183,136,.5)" stroke-width="1"/>
+          <circle cx="282" cy="130" r="3" fill="#52b788"/>
+          <text x="290" y="127" fill="rgba(82,183,136,.6)" font-size="8" font-family="DM Mono,monospace">BK-04</text>
+        </svg>
+      </div>
+    </div>
+    <div class="ci tl">LAT<span>-1.2921°</span></div>
+    <div class="ci tr">LON<span>36.8219°</span></div>
+    <div class="ci bl">DATUM<span>ARC 1960</span></div>
+    <div class="ci br">ZONE<span>37 S</span></div>
+  </div>
+  <div class="hs">
+    <div class="hst"><div class="hsn">10<sup>+</sup></div><div class="hsl">Years Experience</div></div>
+    <div class="hst"><div class="hsn">500<sup>+</sup></div><div class="hsl">Plots Surveyed</div></div>
+    <div class="hst"><div class="hsn">47</div><div class="hsl">Counties Covered</div></div>
+    <div class="hst"><div class="hsn">100<sup>%</sup></div><div class="hsl">Legal Compliance</div></div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="tw" aria-hidden="true">
+  <div class="tt">
+    <div class="ti"><span class="td"></span>Land Subdivision</div><div class="ti"><span class="td"></span>Beacon Setting</div><div class="ti"><span class="td"></span>Title Deed Processing</div><div class="ti"><span class="td"></span>GIS Mapping</div><div class="ti"><span class="td"></span>Topographical Survey</div><div class="ti"><span class="td"></span>Land Transfer</div><div class="ti"><span class="td"></span>RTK GPS · mm Accuracy</div><div class="ti"><span class="td"></span>ISK Registered</div><div class="ti"><span class="td"></span>Ministry of Lands Approved</div><div class="ti"><span class="td"></span>47 Counties</div>
+    <div class="ti"><span class="td"></span>Land Subdivision</div><div class="ti"><span class="td"></span>Beacon Setting</div><div class="ti"><span class="td"></span>Title Deed Processing</div><div class="ti"><span class="td"></span>GIS Mapping</div><div class="ti"><span class="td"></span>Topographical Survey</div><div class="ti"><span class="td"></span>Land Transfer</div><div class="ti"><span class="td"></span>RTK GPS · mm Accuracy</div><div class="ti"><span class="td"></span>ISK Registered</div><div class="ti"><span class="td"></span>Ministry of Lands Approved</div><div class="ti"><span class="td"></span>47 Counties</div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services" class="sp">
+  <div class="sh">
+    <div data-r><div class="sl2">What We Offer</div><h2 class="stt">Our <em>Services</em></h2></div>
+    <p class="sd" data-r>From boundary verification to full title deed processing — comprehensive land solutions backed by precision RTK GPS technology, experienced licensed surveyors, and complete legal compliance across all 47 counties of Kenya.</p>
+  </div>
+  <div class="sg" data-r>
+    <div class="sc2"><div class="sf"></div><div class="snum">01 / 06</div><div class="sico"><svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 21V11h6v10"/></svg></div><h3 class="snm">Land Subdivision</h3><p class="stxt">We subdivide land into legally compliant, properly registered plots tailored to your development goals. Our surveyors prepare Ministry of Lands-approved mutation documents and coordinate all county approvals for seamless registration.</p><div class="sar"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+    <div class="sc2"><div class="sf"></div><div class="snum">02 / 06</div><div class="sico"><svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div><h3 class="snm">Beacon Setting</h3><p class="stxt">Our licensed surveyors deploy RTK GPS equipment to set physical boundary beacons with millimetre precision. Every beacon is legally referenced to the national grid, giving you defensible, court-admissible boundary records.</p><div class="sar"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+    <div class="sc2"><div class="sf"></div><div class="snum">03 / 06</div><div class="sico"><svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div><h3 class="snm">Title Deed Processing</h3><p class="stxt">We manage the entire title deed lifecycle — from preparing survey plans and Land Control Board applications to lodging documents at the Lands Registry. We follow up at every stage so you receive your title deed fast and without hassle.</p><div class="sar"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+    <div class="sc2"><div class="sf"></div><div class="snum">04 / 06</div><div class="sico"><svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3 class="snm">Land Transfer</h3><p class="stxt">We facilitate smooth, legally sound ownership transfers for both buyers and sellers. Our team handles stamp duty assessments, consent applications, Land Control Board hearings, and final deed registration — protecting your interest at every step.</p><div class="sar"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+    <div class="sc2"><div class="sf"></div><div class="snum">05 / 06</div><div class="sico"><svg viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/></svg></div><h3 class="snm">GIS Mapping</h3><p class="stxt">We produce high-resolution GIS maps for land planning, environmental impact assessments, infrastructure development, and investment due diligence. All outputs are georeferenced to Kenya's national coordinate system and delivered in multiple formats.</p><div class="sar"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+    <div class="sc2"><div class="sf"></div><div class="snum">06 / 06</div><div class="sico"><svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M3 17l4-8 4 5 3-3 4 6"/><path d="M3 3v18h18"/></svg></div><h3 class="snm">Topographical Survey</h3><p class="stxt">Our topographical surveys capture detailed terrain data — contours, spot heights, natural features, and infrastructure — using total stations and drone photogrammetry. Essential for architects, engineers, and developers planning any construction or earthworks project.</p><div class="sar"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="md" aria-hidden="true">
+  <div class="mtr">
+    <span class="mw">Precision</span><span class="mw f">✦</span><span class="mw">Accuracy</span><span class="mw f">✦</span><span class="mw">Compliance</span><span class="mw f">✦</span><span class="mw">Kenya</span><span class="mw f">✦</span><span class="mw">Trusted</span><span class="mw f">✦</span>
+    <span class="mw">Precision</span><span class="mw f">✦</span><span class="mw">Accuracy</span><span class="mw f">✦</span><span class="mw">Compliance</span><span class="mw f">✦</span><span class="mw">Kenya</span><span class="mw f">✦</span><span class="mw">Trusted</span><span class="mw f">✦</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="av" data-rl>
+    <div class="aog"></div>
+    <div class="avi">
+      <div class="amw">
+        <svg viewBox="0 0 340 340" xmlns="http://www.w3.org/2000/svg">
+          <defs><filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+          <polygon points="80,60 190,45 270,90 285,185 220,260 100,245 55,165" fill="rgba(82,183,136,.04)" stroke="rgba(82,183,136,.35)" stroke-width="1.5"/>
+          <polygon points="190,45 270,90 252,148 190,125" fill="rgba(82,183,136,.06)" stroke="rgba(82,183,136,.25)" stroke-width="1"/>
+          <polygon points="80,60 190,45 190,125 108,148" fill="rgba(82,183,136,.06)" stroke="rgba(82,183,136,.25)" stroke-width="1"/>
+          <polygon points="108,148 190,125 230,188 165,215 95,192" fill="rgba(82,183,136,.04)" stroke="rgba(82,183,136,.2)" stroke-width="1"/>
+          <line x1="80" y1="60" x2="285" y2="185" stroke="rgba(82,183,136,.15)" stroke-width="1" stroke-dasharray="5 5"/>
+          <line x1="190" y1="45" x2="100" y2="245" stroke="rgba(82,183,136,.12)" stroke-width="1" stroke-dasharray="5 5"/>
+          <g filter="url(#glow)">
+            <circle cx="80" cy="60" r="5" fill="#52b788"/><circle cx="190" cy="45" r="5" fill="#52b788"/>
+            <circle cx="270" cy="90" r="5" fill="#52b788"/><circle cx="285" cy="185" r="5" fill="#52b788"/>
+            <circle cx="220" cy="260" r="5" fill="#52b788"/><circle cx="100" cy="245" r="5" fill="#52b788"/>
+            <circle cx="55" cy="165" r="5" fill="#52b788"/>
+          </g>
+          <circle cx="190" cy="125" r="3.5" fill="rgba(82,183,136,.6)" stroke="rgba(82,183,136,.4)" stroke-width="1"/>
+          <circle cx="108" cy="148" r="3.5" fill="rgba(82,183,136,.6)" stroke="rgba(82,183,136,.4)" stroke-width="1"/>
+          <text x="118" y="88" fill="rgba(82,183,136,.65)" font-size="9" font-family="DM Mono,monospace" letter-spacing="1">LOT A — 0.45ha</text>
+          <text x="200" y="112" fill="rgba(82,183,136,.55)" font-size="9" font-family="DM Mono,monospace" letter-spacing="1">LOT B</text>
+          <text x="118" y="185" fill="rgba(82,183,136,.5)" font-size="9" font-family="DM Mono,monospace" letter-spacing="1">LOT C — 0.62ha</text>
+          <g transform="translate(288,28)">
+            <circle cx="0" cy="0" r="22" fill="rgba(13,26,16,.8)" stroke="rgba(82,183,136,.4)" stroke-width="1"/>
+            <polygon points="0,-14 3,-3 -3,-3" fill="#52b788"/><polygon points="0,14 3,3 -3,3" fill="rgba(82,183,136,.3)"/>
+            <polygon points="14,0 3,3 3,-3" fill="rgba(82,183,136,.25)"/><polygon points="-14,0 -3,3 -3,-3" fill="rgba(82,183,136,.25)"/>
+            <text x="-2.5" y="-17" fill="#52b788" font-size="7" font-family="DM Mono,monospace">N</text>
+          </g>
+          <g transform="translate(55,295)">
+            <line x1="0" y1="0" x2="90" y2="0" stroke="rgba(82,183,136,.5)" stroke-width="1.5"/>
+            <line x1="0" y1="-4" x2="0" y2="4" stroke="rgba(82,183,136,.5)"/>
+            <line x1="90" y1="-4" x2="90" y2="4" stroke="rgba(82,183,136,.5)"/>
+            <text x="22" y="-9" fill="rgba(82,183,136,.5)" font-size="7.5" font-family="DM Mono,monospace">50 METRES</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div class="abg"><b>ISK</b><small>Registered</small></div>
+    <div class="ab">
+      <div class="ac2"><span>Latitude</span>–1.2921° S</div>
+      <div class="ac2"><span>Longitude</span>36.8219° E</div>
+      <div class="ac2"><span>Datum</span>ARC 1960</div>
+    </div>
+  </div>
+  <div class="acd" data-rr>
+    <div class="sl2">Why Choose Us</div>
+    <h2 class="stt">Built On<br><em>Precision</em></h2>
+    <p style="color:var(--cream4);font-size:.9rem;line-height:1.9;margin-top:1.2rem;">KJ Land Surveyors & Realtors Consultants has been Kenya's trusted land surveying partner since 2014. We combine advanced technology with deep local knowledge to deliver results that are accurate, legally watertight, and on time.</p>
+    <div class="af"><div class="afn">01</div><div><div class="aft">Millimetre-Grade RTK GPS Accuracy</div><p class="afp">Our Trimble and Leica RTK GPS systems achieve sub-centimetre horizontal accuracy. Every boundary is measured, computed, and certified to national geodetic standards — giving you results that stand in any legal dispute or government review.</p></div></div>
+    <div class="af"><div class="afn">02</div><div><div class="aft">100% ISK & Ministry of Lands Compliance</div><p class="afp">Fully licensed by the Institution of Surveyors of Kenya and the Ministry of Lands. All survey reports, mutation forms, and title deed documents are prepared to exact regulatory specifications — accepted first time, every time.</p></div></div>
+    <div class="af"><div class="afn">03</div><div><div class="aft">Coverage Across All 47 Counties</div><p class="afp">We operate a network of field teams stationed across Kenya. Whether your land is in Nairobi CBD, the highlands of Nyeri, the coast of Mombasa, or the arid plains of Turkana — we reach you within days, not weeks.</p></div></div>
+    <div class="af"><div class="afn">04</div><div><div class="aft">Complete End-to-End Ownership</div><p class="afp">One engagement, full accountability. We handle consultation, fieldwork, data processing, government lodgement, and title collection under one roof. No subcontracting, no surprise handoffs — just a single team that owns the outcome.</p></div></div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="test-header" data-r>
+    <div class="sl2">Client Voices</div>
+    <h2 class="stt">What Our <em>Clients Say</em></h2>
+  </div>
+  <div class="test-grid" data-r>
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <p class="test-quote">KJ completed our 5-acre subdivision in Kiambu in under three weeks. The beacons were perfectly placed, the mutation documents were ready quickly, and the whole process was stress-free. I highly recommend them.</p>
+      <div class="test-name">James Mwangi</div>
+      <div class="test-loc">Kiambu County · Land Subdivision</div>
+    </div>
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <p class="test-quote">We had a boundary dispute with a neighbour that had dragged on for two years. KJ surveyed our plot, produced certified boundary records, and the matter was resolved in court within a month. Extremely professional.</p>
+      <div class="test-name">Grace Njeri</div>
+      <div class="test-loc">Nakuru County · Beacon Setting</div>
+    </div>
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <p class="test-quote">Title deed processing can be a nightmare, but KJ handled everything from stamp duty to the Lands Registry lodgement. We received our title deed in record time. The team kept us updated at every step.</p>
+      <div class="test-name">Peter Otieno</div>
+      <div class="test-loc">Nairobi · Title Deed Processing</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process" class="sp">
+  <div class="ph" data-r><div class="sl2">How It Works</div><h2 class="stt">Our <em>Process</em></h2></div>
+  <div class="pg" data-r>
+    <div class="pcon"></div>
+    <div class="ps"><div class="pc">I</div><div class="ptg">Step One</div><div class="pn">Consultation</div><p class="pt">We begin with a detailed consultation — reviewing your title, existing survey plans, and land use objectives. We identify potential issues early, confirm scope, and agree on a timeline before any fieldwork begins.</p></div>
+    <div class="ps"><div class="pc">II</div><div class="ptg">Step Two</div><div class="pn">Site Survey</div><p class="pt">Our licensed surveyors deploy to your land with Trimble RTK GPS receivers and total stations. We measure every corner and boundary with millimetre precision, capturing all features needed for your specific service.</p></div>
+    <div class="ps"><div class="pc">III</div><div class="ptg">Step Three</div><div class="pn">Data Processing</div><p class="pt">Back in our office, raw field data is processed using industry-leading surveying software. We prepare certified survey plans, mutation forms, or GIS outputs — checked by a senior surveyor before submission.</p></div>
+    <div class="ps"><div class="pc">IV</div><div class="ptg">Step Four</div><div class="pn">Title Delivery</div><p class="pt">We lodge all documents with the relevant government offices and follow up proactively on your behalf. When your title deed or survey certificate is ready, we deliver it directly to you — job complete.</p></div>
+  </div>
+</section>
+
+<!-- TECHNOLOGY -->
+<section id="technology" class="sp">
+  <div class="th" data-r>
+    <div><div class="sl2">Our Arsenal</div><h2 class="stt">Cutting-Edge <em>Technology</em></h2></div>
+    <p style="color:var(--cream4);font-size:.85rem;max-width:340px;text-align:right;line-height:1.8;">We invest in the best survey instruments available to ensure our results are precise, repeatable, and legally defensible.</p>
+  </div>
+  <div class="tg" data-r>
+    <div class="tc"><div class="tcs"></div><div class="tcl">Sub-cm Precision</div><div class="tico"><svg viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg></div><div class="tn">Trimble RTK GPS</div><div class="ts2">Survey Systems</div></div>
+    <div class="tc"><div class="tcs"></div><div class="tcl">Georeferenced Data</div><div class="tico"><svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M3 7l9-4 9 4-9 4-9-4zM3 12l9 4 9-4M3 17l9 4 9-4"/></svg></div><div class="tn">ArcGIS & QGIS</div><div class="ts2">GIS Mapping</div></div>
+    <div class="tc"><div class="tcs"></div><div class="tcl">Angular Precision</div><div class="tico"><svg viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="tn">Leica Total Station</div><div class="ts2">Field Equipment</div></div>
+    <div class="tc"><div class="tcs"></div><div class="tcl">5cm Ortho Accuracy</div><div class="tico"><svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div><div class="tn">DJI Phantom Drone</div><div class="ts2">Aerial Photogrammetry</div></div>
+    <div class="tc"><div class="tcs"></div><div class="tcl">Certified Drawings</div><div class="tico"><svg viewBox="0 0 24 24" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg></div><div class="tn">AutoCAD Survey</div><div class="ts2">Plans & Drawings</div></div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="faq-header" data-r>
+    <div class="sl2">Common Questions</div>
+    <h2 class="stt">Frequently Asked <em>Questions</em></h2>
+  </div>
+  <div class="faq-grid" data-r>
+    <div class="faq-item">
+      <div class="faq-q">How long does a land subdivision take?</div>
+      <p class="faq-a">A straightforward subdivision typically takes 3–6 weeks from field survey to final title registration. Complex cases involving many plots or multiple county offices may take longer. We give you a clear timeline estimate at consultation.</p>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What documents do I need to start?</div>
+      <p class="faq-a">You will need your original title deed or certificate of lease, a copy of your national ID or passport, KRA PIN certificate, and any existing survey plans. We review all documents at the consultation stage and advise on anything missing.</p>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Do you operate outside Nairobi?</div>
+      <p class="faq-a">Yes — we operate across all 47 counties of Kenya. We have field teams in Mombasa, Kisumu, Nakuru, Eldoret, Nyeri, and other regional centres. Remote counties can be served with appropriate advance notice.</p>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">How accurate are your GPS surveys?</div>
+      <p class="faq-a">Our Trimble RTK GPS systems achieve horizontal accuracy of ±10mm and vertical accuracy of ±20mm under clear-sky conditions. This exceeds the minimum accuracy standards set by the Survey Act of Kenya and the Institution of Surveyors of Kenya.</p>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Can you help resolve a boundary dispute?</div>
+      <p class="faq-a">Yes. We conduct dispute surveys that produce certified boundary records admissible in court and at the Land Disputes Tribunal. Our reports clearly document measurements, methodology, and findings — giving you solid evidence to support your claim.</p>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">How do I get a quote?</div>
+      <p class="faq-a">Contact us via WhatsApp on +254 720 397313 or use the enquiry form below. Share your title deed, a sketch or description of your land, and the service you need — we'll provide a detailed written quote within 24 hours.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="cl2" data-rl>
+    <div class="sl2">Reach Out</div>
+    <h2 class="stt">Start Your<br><em>Project</em></h2>
+    <p style="color:var(--cream4);margin-top:1.5rem;line-height:1.9;font-size:.92rem;max-width:360px;">Ready to get started? Chat with us on WhatsApp for a quick response, send us an email, or find our office on Google Maps. We respond to all enquiries within 24 hours.</p>
+
+    <div class="contact-actions">
+      <a href="https://wa.me/254720397313?text=Hello%2C%20I%20would%20like%20to%20enquire%20about%20your%20land%20survey%20services." target="_blank" rel="noopener" class="cta-btn btn-wa">
+        <div class="cta-btn-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+          </svg>
+        </div>
+        <div class="cta-btn-body">
+          <span class="cta-btn-label">Chat with us on WhatsApp</span>
+          <span class="cta-btn-value">+254 720 397313</span>
+        </div>
+      </a>
+
+      <a href="mailto:info@kjlandsurveyor.co.ke?subject=Land%20Survey%20Enquiry" class="cta-btn btn-em">
+        <div class="cta-btn-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+        </div>
+        <div class="cta-btn-body">
+          <span class="cta-btn-label">Email us</span>
+          <span class="cta-btn-value">info@kjlandsurveyor.co.ke</span>
+        </div>
+      </a>
+
+      <a href="https://maps.google.com/?q=KJ+Land+Surveyors+Nairobi+Kenya" target="_blank" rel="noopener" class="cta-btn btn-gm">
+        <div class="cta-btn-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div class="cta-btn-body">
+          <span class="cta-btn-label">Find our office</span>
+          <span class="cta-btn-value">Open in Google Maps</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="cds">
+      <div class="ci2"><div class="cico"><svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div><div class="cil">Head Office</div><div class="civ">Nairobi, Kenya</div></div></div>
+      <div class="ci2"><div class="cico"><svg viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div><div class="cil">Working Hours</div><div class="civ">Mon–Sat, 8am–6pm</div></div></div>
+      <div class="ci2"><div class="cico"><svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><div class="cil">Field Coverage</div><div class="civ">All 47 Counties of Kenya</div></div></div>
+      <div class="ci2"><div class="cico"><svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div class="cil">Certification</div><div class="civ">ISK Registered · Ministry of Lands Approved</div></div></div>
+    </div>
+  </div>
+
+  <div class="cr" data-rr>
+    <div class="sl2">Send Enquiry</div>
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--white);margin-bottom:.5rem;">Tell us about your land.</h3>
+    <p style="color:var(--cream4);font-size:.85rem;line-height:1.8;margin-bottom:2rem;">Fill in the form and we'll get back to you with a detailed quote within 24 hours.</p>
+    <form class="cf" onsubmit="return false;">
+      <div class="crow">
+        <div class="cg"><label class="cfl">Full Name</label><input class="cin" type="text" placeholder="John Kamau"/></div>
+        <div class="cg"><label class="cfl">Phone Number</label><input class="cin" type="tel" placeholder="+254 720 000 000"/></div>
+      </div>
+      <div class="crow">
+        <div class="cg"><label class="cfl">County</label><input class="cin" type="text" placeholder="e.g. Nairobi, Kiambu…"/></div>
+        <div class="cg"><label class="cfl">Plot Size (approx.)</label><input class="cin" type="text" placeholder="e.g. 0.5 acres, 50×100…"/></div>
+      </div>
+      <div class="cg"><label class="cfl">Service Required</label>
+        <select class="csel">
+          <option value="" disabled selected>Select a service</option>
+          <option>Land Subdivision</option>
+          <option>Beacon Setting / Boundary Survey</option>
+          <option>Title Deed Processing</option>
+          <option>Land Transfer</option>
+          <option>GIS Mapping</option>
+          <option>Topographical Survey</option>
+          <option>Boundary Dispute Resolution</option>
+          <option>Other — describe below</option>
+        </select>
+      </div>
+      <div class="cg"><label class="cfl">Message</label><textarea class="cta" placeholder="Describe your land, what you need, and any questions you have…"></textarea></div>
+      <button class="csub" type="submit">
+        <span>Send Enquiry</span>
+        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="ft-brand">
+      <div style="display:flex;align-items:center;gap:.8rem;">
+        <div class="nlm" style="width:38px;height:38px;font-size:.9rem;">KJ</div>
+        <div class="nlt"><b style="font-size:1rem;">KJ Land Surveyors</b><small>& Realtors Consultants</small></div>
+      </div>
+      <p>Kenya's #1 ISK-registered land surveying and realty consultancy. Precision GPS surveys, title deed processing, GIS mapping, and land transfer services across all 47 counties since 2014.</p>
+      <div style="display:flex;gap:1rem;margin-top:1.5rem;">
+        <a href="https://wa.me/254720397313" target="_blank" rel="noopener" style="width:36px;height:36px;border:1px solid rgba(37,211,102,.3);display:flex;align-items:center;justify-content:center;text-decoration:none;transition:background .3s;" onmouseenter="this.style.background='rgba(37,211,102,.12)'" onmouseleave="this.style.background='transparent'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </a>
+        <a href="mailto:info@kjlandsurveyor.co.ke" style="width:36px;height:36px;border:1px solid rgba(74,144,217,.3);display:flex;align-items:center;justify-content:center;text-decoration:none;transition:background .3s;" onmouseenter="this.style.background='rgba(74,144,217,.12)'" onmouseleave="this.style.background='transparent'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A90D9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="ft-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="#services">Land Subdivision</a></li>
+        <li><a href="#services">Beacon Setting</a></li>
+        <li><a href="#services">Title Deed Processing</a></li>
+        <li><a href="#services">Land Transfer</a></li>
+        <li><a href="#services">GIS Mapping</a></li>
+        <li><a href="#services">Topographical Survey</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#process">Our Process</a></li>
+        <li><a href="#technology">Technology</a></li>
+        <li><a href="#testimonials">Client Stories</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="https://wa.me/254720397313" target="_blank" rel="noopener">+254 720 397313</a></li>
+        <li><a href="mailto:info@kjlandsurveyor.co.ke">info@kjlandsurveyor.co.ke</a></li>
+        <li><a href="#contact">Nairobi, Kenya</a></li>
+        <li><a href="#contact">Mon–Sat, 8am–6pm</a></li>
+        <li><a href="#contact">All 47 Counties</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="fc">© 2026 KJ Land Surveyors & Realtors Consultants · ISK Registered · Ministry of Lands Approved · Kenya</p>
+    <ul class="fl">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+// LOADER
+window.addEventListener('load',()=>{setTimeout(()=>{const l=document.getElementById('loader');l.classList.add('done');setTimeout(()=>l.remove(),800);},2300);});
+
+// CURSOR
+const dot=document.getElementById('cur-dot'),ring=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.transform=`translate(${mx}px,${my}px)`;});
+(function tick(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;ring.style.transform=`translate(${rx}px,${ry}px)`;requestAnimationFrame(tick);})();
+document.querySelectorAll('a,button,.sc2,.tc,.ps,.af,.cta-btn,.faq-item,.test-card').forEach(el=>{el.addEventListener('mouseenter',()=>document.body.classList.add('cl'));el.addEventListener('mouseleave',()=>document.body.classList.remove('cl'));});
+document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('mouseenter',()=>document.body.classList.add('ct'));el.addEventListener('mouseleave',()=>document.body.classList.remove('ct'));});
+
+// NAV
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('compact',scrollY>60),{passive:true});
+
+// CANVAS
+const canvas=document.getElementById('hc'),ctx=canvas.getContext('2d');
+let W,H,pts=[];
+function rsz(){W=canvas.width=canvas.offsetWidth;H=canvas.height=canvas.offsetHeight;}
+rsz();window.addEventListener('resize',rsz);
+class P{constructor(){this.rst();}rst(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.3;this.vy=(Math.random()-.5)*.3;this.r=Math.random()*1.5+.3;this.a=Math.random()*.35+.08;this.life=0;this.ml=Math.random()*400+200;}upd(){this.x+=this.vx;this.y+=this.vy;this.life++;if(this.life>this.ml||this.x<0||this.x>W||this.y<0||this.y>H)this.rst();}draw(){const f=Math.min(this.life/60,1)*Math.min((this.ml-this.life)/60,1);ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(82,183,136,${this.a*f})`;ctx.fill();}}
+for(let i=0;i<80;i++)pts.push(new P());
+function drawLines(){for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<100){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(82,183,136,${(1-d/100)*.06})`;ctx.lineWidth=.5;ctx.stroke();}}}
+(function anim(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.upd();p.draw();});drawLines();requestAnimationFrame(anim);})();
+
+// LIQUID FILL
+document.querySelectorAll('.sc2').forEach(c=>{c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect();c.style.setProperty('--mx',((e.clientX-r.left)/r.width*100).toFixed(1)+'%');c.style.setProperty('--my',((e.clientY-r.top)/r.height*100).toFixed(1)+'%');});});
+
+// REVEAL
+const revEls=document.querySelectorAll('[data-r],[data-rl],[data-rr]');
+const ro=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const ch=e.target.querySelectorAll('.sc2,.ps,.tc,.af,.test-card,.faq-item');if(ch.length){ch.forEach((c,i)=>{c.style.opacity='0';c.style.transform='translateY(20px)';c.style.transition='opacity .7s,transform .7s';setTimeout(()=>{c.style.opacity='1';c.style.transform='none';},i*100+100);});}e.target.classList.add('on');ro.unobserve(e.target);}});},{threshold:.1});
+revEls.forEach(el=>ro.observe(el));
+
+// COUNTER
+const so=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){document.querySelectorAll('.hsn').forEach(el=>{const sup=el.querySelector('sup');const suf=sup?sup.textContent:'';const num=parseInt(el.textContent);let s=0;const step=num/60;el.innerHTML=`0${sup?`<sup>${suf}</sup>`:''}`;const tn=document.createTextNode('0');el.insertBefore(tn,el.firstChild);const id=setInterval(()=>{s+=step;if(s>=num){s=num;clearInterval(id);}tn.nodeValue=Math.floor(s);},16);});so.disconnect();}});},{threshold:.5});
+const statsEl=document.querySelector('.hs');if(statsEl)so.observe(statsEl);
+</script>
+</body>
+</html>
